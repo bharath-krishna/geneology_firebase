@@ -2,6 +2,11 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
+Befire running dev server install required packages as below
+```
+yarn add @material-ui/core @material-ui/lab @material-ui/icons redux react-redux typescript firebase next-redux-wrapper redux-devtools-extension redux-thunk
+```
+
 First, run the development server:
 
 ```bash
