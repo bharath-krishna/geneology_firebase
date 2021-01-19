@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { setUser } from "../redux/actions/user";
 import app from "../firebase";
 
-export const AuthContext = createContext();
+export const AuthContext = createContext({});
 
 // const provider = new firebase.auth.GoogleAuthProvider();
 
