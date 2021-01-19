@@ -1,28 +1,34 @@
-import { CircularProgress } from "@material-ui/core";
+import { CircularProgress, Container } from "@material-ui/core";
 import React, { createContext, useEffect } from "react";
 import { connect } from "react-redux";
 import { setUser } from "../redux/actions/user";
 import app from "../firebase";
 
-export const AuthContext = createContext({});
+export const AuthContext = createContext();
 
 // const provider = new firebase.auth.GoogleAuthProvider();
 
 function AuthProvider({ children, user, setUser }) {
   useEffect(() => {
-    // app
-    //   .auth()
-    //   .signInWithEmailAndPassword("test@test.com", "password")
-    //   .then((user) => setUser(user))
-    //   .catch((error) => console.log(error));
-    setUser({ name: "dummy" });
+    app
+      .auth()
+      .signInWithEmailAndPassword("test@test.com", "password")
+      .then((user) => setUser(user))
+      .catch((error) => console.log(error));
   }, []);
   return (
     <React.Fragment>
       {user ? (
         <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>
       ) : (
-        <CircularProgress />
+        <Container
+          style={{
+            justifyContent: "center",
+            display: "flex",
+          }}
+        >
+          <CircularProgress />
+        </Container>
       )}
     </React.Fragment>
   );

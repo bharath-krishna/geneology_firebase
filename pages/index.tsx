@@ -17,7 +17,7 @@ import {
 import { connect } from "react-redux";
 import { setPeople, setPerson } from "../redux/actions/people";
 import { db } from "../firebase";
-import { PersonModel } from "../models/Person";
+import { PersonModel } from "../models/person";
 import PersonModal from "./_personModal";
 import { useForm } from "react-hook-form";
 import { Autocomplete } from "@material-ui/lab";
@@ -39,7 +39,7 @@ const Index: React.FC<{
   setPeople: ({}) => void;
 }> = ({ person, setPerson, people, setPeople }) => {
   const classes = useStyles();
-  const { user } = useContext(AuthContext);
+  // const { user } = useContext(AuthContext);
   const [open, setOpen] = useState(false);
 
   const fetchPeopleData = async (setter) => {
