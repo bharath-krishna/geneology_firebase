@@ -1,5 +1,11 @@
 import { connect } from "react-redux";
-import { Button, MenuItem, TextField } from "@material-ui/core";
+import {
+  Avatar,
+  Button,
+  makeStyles,
+  MenuItem,
+  TextField,
+} from "@material-ui/core";
 import { Autocomplete } from "@material-ui/lab";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -7,13 +13,19 @@ import { PersonModel } from "../models/person";
 import { setPeople, setPerson } from "../redux/actions/people";
 import { db } from "../firebase";
 import { GENDERS } from "../redux/constants";
+import { Container } from "next/app";
 
-const PersonForm: React.FC<{ people: PersonModel[]; person: PersonModel }> = ({
-  people,
-  person,
-}) => {
+const useStyles = makeStyles((theme) => ({}));
+
+const PersonForm: React.FC<{
+  people: PersonModel[];
+  person: PersonModel;
+  setPerson: (person: PersonModel) => void;
+}> = ({ people, person, setPerson }) => {
+  const classes = useStyles();
   const { register, handleSubmit } = useForm();
 
+  const [id, setId] = useState<string>(person.id);
   const [name, setName] = useState<string>(person.Name);
   const [partners, setPartners] = useState<string[]>([]);
   const [children, setChildren] = useState<string[]>([]);
@@ -23,7 +35,7 @@ const PersonForm: React.FC<{ people: PersonModel[]; person: PersonModel }> = ({
 
   const getById = async (id) => {
     const data = await db.collection("people").doc(id).get();
-    return await data.data();
+    return data.data();
   };
 
   useEffect(() => {
@@ -33,7 +45,9 @@ const PersonForm: React.FC<{ people: PersonModel[]; person: PersonModel }> = ({
     person.Partners.map((id) => {
       const data = getById(id).then((result: PersonModel) => {
         result.id = id;
-        setDefaultPartners([result]);
+        setDefaultPartners((prevState: PersonModel[]) => {
+          return [...prevState, result];
+        });
       });
     });
 
@@ -41,16 +55,38 @@ const PersonForm: React.FC<{ people: PersonModel[]; person: PersonModel }> = ({
     person.Children.map((id) => {
       const data = getById(id).then((result: PersonModel) => {
         result.id = id;
-        setDefaultChildren([result]);
+        setDefaultChildren((prevState: PersonModel[]) => {
+          return [...prevState, result];
+        });
       });
     });
 
     setGender(person.Gender);
+    setId(person.id);
   }, [person]);
 
   const handleOnSubmit = (data) => {
-    data.Partners = defaultPartners;
+    data.Partners = defaultPartners.map((person) => person.id);
+    data.Children = defaultChildren.map((person) => person.id);
+    data.Gender = gender;
+    data.id = id;
     console.log("OnSubit", data);
+    addEditPerson(data);
+  };
+
+  const addEditPerson = async (person: PersonModel) => {
+    if (person.id !== "") {
+      const doc = await db.collection("people").doc(person.id).set(person);
+    } else {
+      const doc = await db.collection("people").add(person);
+    }
+    setPerson({
+      id: "",
+      Name: "",
+      Partners: [],
+      Children: [],
+      Gender: "",
+    });
   };
 
   return (
@@ -93,6 +129,11 @@ const PersonForm: React.FC<{ people: PersonModel[]; person: PersonModel }> = ({
             return false;
           }
         }}
+        ChipProps={{
+          color: "primary",
+          size: "small",
+          icon: <Avatar />,
+        }}
         multiple
         filterSelectedOptions
       />
@@ -126,11 +167,17 @@ const PersonForm: React.FC<{ people: PersonModel[]; person: PersonModel }> = ({
             return false;
           }
         }}
+        ChipProps={{
+          color: "primary",
+          size: "small",
+          icon: <Avatar />,
+        }}
         multiple
         filterSelectedOptions
       />
 
       <TextField
+        inputRef={register}
         select
         label="Gender"
         name="Gender"
@@ -149,6 +196,21 @@ const PersonForm: React.FC<{ people: PersonModel[]; person: PersonModel }> = ({
 
       <Button type="submit" variant="contained" color="primary">
         Submit
+      </Button>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => {
+          setPerson({
+            id: "",
+            Name: "",
+            Partners: [],
+            Children: [],
+            Gender: "",
+          });
+        }}
+      >
+        Clear
       </Button>
     </form>
   );

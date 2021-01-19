@@ -25,8 +25,10 @@ import PersonForm from "./_personForm";
 
 const useStyles = makeStyles((theme) => ({
   container: {
-    display: "flex",
-    justifyContent: "center",
+    padding: "40px",
+  },
+  formGrid: {
+    minWidth: 350,
   },
 }));
 
@@ -40,12 +42,13 @@ const Index: React.FC<{
   const { user } = useContext(AuthContext);
   const [open, setOpen] = useState(false);
 
+  const fetchPeopleData = async (setter) => {
+    const data = await db.collection("people").get();
+    setter(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await db.collection("people").get();
-      setPeople(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-    };
-    fetchData();
+    fetchPeopleData(setPeople);
   }, []);
 
   const handleAddPerson = () => {
@@ -53,18 +56,22 @@ const Index: React.FC<{
   };
 
   return (
-    <Grid container direction="column" alignContent="center">
-      <Grid item sm={12} md={6}>
-        <List>
-          {people.map((elem, index) => {
-            return <PersonItem item={elem} key={index} setPerson={setPerson} />;
-          })}
-        </List>
+    <Container className={classes.container}>
+      <Grid container alignContent="center">
+        <Grid item sm={12} md={6}>
+          <List>
+            {people.map((elem, index) => {
+              return (
+                <PersonItem item={elem} key={index} setPerson={setPerson} />
+              );
+            })}
+          </List>
+        </Grid>
+        <Grid item sm={12} md={6} className={classes.formGrid}>
+          <PersonForm />
+        </Grid>
       </Grid>
-      <Grid item sm={12} md={6}>
-        <PersonForm />
-      </Grid>
-    </Grid>
+    </Container>
   );
 };
 
@@ -91,8 +98,13 @@ const PersonItem: React.FC<{
   const handleEdit = () => {
     setPerson(item);
   };
+  const getById = async (id) => {
+    const data = await db.collection("people").doc(id).get();
+    return await data.data();
+  };
+
   return (
-    <ListItem>
+    <ListItem button onClick={handleEdit}>
       <ListItemAvatar>
         <Avatar />
       </ListItemAvatar>
@@ -101,13 +113,16 @@ const PersonItem: React.FC<{
         secondary={
           <React.Fragment>
             <Typography variant="body2" component="span">
-              {item.Gender}, has children {item.Children.join(", ")}
+              {item.Gender}, has children{" "}
+              {item.Children.map((id) => {
+                return id;
+              })}
             </Typography>
           </React.Fragment>
         }
       />
       <ListItemSecondaryAction>
-        <Button onClick={handleEdit}>Edit</Button>
+        {/* <Button onClick={handleEdit}>Edit</Button> */}
       </ListItemSecondaryAction>
     </ListItem>
   );
