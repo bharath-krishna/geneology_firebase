@@ -9,7 +9,7 @@ import {
 import { connect } from "react-redux";
 import PersonForm from "./_personForm";
 import { setPeople, setPerson } from "../redux/actions/people";
-import { PersonModel } from "../models/Person";
+import { PersonModel } from "../models/person";
 
 const useStyles = makeStyles((theme) => ({
   modal: {
