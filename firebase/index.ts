@@ -2,7 +2,7 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firebase-firestore";
 
-let app;
+let app: firebase.app.App;
 
 if (!firebase.apps.length) {
   app = firebase.initializeApp({
@@ -19,5 +19,5 @@ if (!firebase.apps.length) {
   app = firebase.app();
 }
 
-export const db = firebase.firestore();
+export const db: firebase.firestore.Firestore = firebase.firestore();
 export default app;

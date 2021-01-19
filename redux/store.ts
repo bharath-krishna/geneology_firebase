@@ -7,6 +7,7 @@ import { createWrapper } from "next-redux-wrapper";
 import { userReducer } from "./reducers/user";
 import { combineReducers } from "redux";
 import thunkMiddleware from "redux-thunk";
+import { peopleReducer, personReducer } from "./reducers/people";
 
 const bindMiddleware = (middleware) => {
   if (process.env.NODE_ENV !== "production") {
@@ -18,9 +19,9 @@ const bindMiddleware = (middleware) => {
 
 const allReducers = combineReducers({
   user: userReducer,
+  people: peopleReducer,
+  person: personReducer,
 });
-
-// export default allReducers;
 
 const reducer = (state, action) => {
   if (action.type === HYDRATE) {
