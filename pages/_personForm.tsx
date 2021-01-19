@@ -20,8 +20,10 @@ const useStyles = makeStyles((theme) => ({}));
 const PersonForm: React.FC<{
   people: PersonModel[];
   person: PersonModel;
+  fetchPeopleData: (setter) => void;
+  setPeople: (people: PersonModel[]) => void;
   setPerson: (person: PersonModel) => void;
-}> = ({ people, person, setPerson }) => {
+}> = ({ people, person, setPerson, fetchPeopleData, setPeople }) => {
   const classes = useStyles();
   const { register, handleSubmit } = useForm();
 
@@ -87,6 +89,8 @@ const PersonForm: React.FC<{
       Children: [],
       Gender: "",
     });
+
+    fetchPeopleData(setPeople);
   };
 
   return (
@@ -136,6 +140,7 @@ const PersonForm: React.FC<{
         }}
         multiple
         filterSelectedOptions
+        autoHighlight
       />
 
       <Autocomplete
@@ -174,6 +179,7 @@ const PersonForm: React.FC<{
         }}
         multiple
         filterSelectedOptions
+        autoHighlight
       />
 
       <TextField

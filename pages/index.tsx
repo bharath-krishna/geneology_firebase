@@ -68,7 +68,7 @@ const Index: React.FC<{
           </List>
         </Grid>
         <Grid item sm={12} md={6} className={classes.formGrid}>
-          <PersonForm />
+          <PersonForm fetchPeopleData={fetchPeopleData} />
         </Grid>
       </Grid>
     </Container>
