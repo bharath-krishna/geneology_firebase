@@ -7,7 +7,13 @@ import { createWrapper } from "next-redux-wrapper";
 import { userReducer } from "./reducers/user";
 import { combineReducers } from "redux";
 import thunkMiddleware from "redux-thunk";
-import { peopleReducer, personReducer } from "./reducers/people";
+import {
+  editIdReducer,
+  openReducer,
+  peopleReducer,
+  personReducer,
+  searchNameReducer,
+} from "./reducers/people";
 
 const bindMiddleware = (middleware) => {
   if (process.env.NODE_ENV !== "production") {
@@ -21,6 +27,9 @@ const allReducers = combineReducers({
   user: userReducer,
   people: peopleReducer,
   person: personReducer,
+  editId: editIdReducer,
+  open: openReducer,
+  searchName: searchNameReducer,
 });
 
 const reducer = (state, action) => {

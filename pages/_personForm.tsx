@@ -2,6 +2,8 @@ import { connect } from "react-redux";
 import {
   Avatar,
   Button,
+  Chip,
+  Container,
   makeStyles,
   MenuItem,
   TextField,
@@ -11,10 +13,9 @@ import { Autocomplete } from "@material-ui/lab";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { PersonModel } from "../models/person";
-import { setPeople, setPerson } from "../redux/actions/people";
+import { setEditId, setPeople, setPerson } from "../redux/actions/people";
 import { db } from "../firebase";
 import { GENDERS } from "../redux/constants";
-import { Container } from "next/app";
 import { fetchPeopleData } from "./index";
 
 const useStyles = makeStyles((theme) => ({}));
@@ -24,7 +25,9 @@ const PersonForm: React.FC<{
   person: PersonModel;
   setPeople: (people: PersonModel[]) => void;
   setPerson: (person: PersonModel) => void;
-}> = ({ people, person, setPerson, setPeople }) => {
+  editId: string;
+  setEditId: (editId: string) => void;
+}> = ({ people, person, setPerson, setPeople, editId, setEditId }) => {
   const classes = useStyles();
   const { register, handleSubmit } = useForm();
 
@@ -35,11 +38,6 @@ const PersonForm: React.FC<{
   const [defaultPartners, setDefaultPartners] = useState<PersonModel[]>([]);
   const [defaultChildren, setDefaultChildren] = useState<PersonModel[]>([]);
   const [gender, setGender] = useState<string>(person.Gender);
-
-  const [nameEdit, nameEditToggler] = useState<boolean>(false);
-  const [partnerEdit, partnerEditToggler] = useState<boolean>(false);
-  const [childrenEdit, childrenEditToggler] = useState<boolean>(false);
-  const [genderEdit, genderEditToggler] = useState<boolean>(false);
 
   const getById = async (id) => {
     const data = await db.collection("people").doc(id).get();
@@ -79,6 +77,15 @@ const PersonForm: React.FC<{
     data.Gender = gender;
     data.id = id;
     addEditPerson(data);
+    setPerson({
+      id: "",
+      Name: "",
+      Partners: [],
+      Children: [],
+      Gender: "",
+    });
+
+    setEditId("");
   };
 
   const addEditPerson = async (person: PersonModel) => {
@@ -99,137 +106,139 @@ const PersonForm: React.FC<{
   };
 
   return (
-    <form onSubmit={handleSubmit(handleOnSubmit)}>
-      <TextField
-        inputRef={register}
-        name="Name"
-        label="Name"
-        value={name}
-        onChange={(e: any) => setName(e.target.value)}
-        fullWidth
-        onKeyPress={(e) => {
-          if (e.key === "Enter") {
-            nameEditToggler(!nameEdit);
-          }
-        }}
-      />
+    <Container>
+      <form onSubmit={handleSubmit(handleOnSubmit)}>
+        {editId === person.id && (
+          <React.Fragment>
+            <TextField
+              inputRef={register}
+              name="Name"
+              label="Name"
+              value={name}
+              onChange={(e: any) => setName(e.target.value)}
+              fullWidth
+            />
 
-      <Autocomplete
-        ref={register}
-        options={people}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            label="Partners"
-            name="Partners"
-            inputRef={register}
-          />
+            <Autocomplete
+              ref={register}
+              options={people}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Partners"
+                  name="Partners"
+                  inputRef={register}
+                />
+              )}
+              value={defaultPartners}
+              onChange={(e: React.ChangeEvent, values: PersonModel[]) => {
+                setDefaultPartners(values);
+              }}
+              getOptionLabel={(option) => {
+                return option.Name;
+              }}
+              getOptionSelected={(option: PersonModel, value: PersonModel) => {
+                2;
+                if (!value) {
+                  return false;
+                }
+
+                if (option.id == value.id) {
+                  return true;
+                } else {
+                  return false;
+                }
+              }}
+              ChipProps={{
+                color: "primary",
+                size: "small",
+                icon: <Avatar />,
+              }}
+              multiple
+              filterSelectedOptions
+              autoHighlight
+            />
+
+            <Autocomplete
+              ref={register}
+              options={people}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Children"
+                  name="Children"
+                  inputRef={register}
+                />
+              )}
+              value={defaultChildren}
+              onChange={(e: React.ChangeEvent, values: PersonModel[]) => {
+                setDefaultChildren(values);
+              }}
+              getOptionLabel={(option) => {
+                return option.Name;
+              }}
+              getOptionSelected={(option: PersonModel, value: PersonModel) => {
+                if (!value) {
+                  return false;
+                }
+
+                if (option.id == value.id) {
+                  return true;
+                } else {
+                  return false;
+                }
+              }}
+              ChipProps={{
+                color: "primary",
+                size: "small",
+                icon: <Avatar />,
+              }}
+              multiple
+              filterSelectedOptions
+              autoHighlight
+            />
+
+            <TextField
+              inputRef={register}
+              select
+              label="Gender"
+              name="Gender"
+              value={gender}
+              onChange={(e: any) => {
+                setGender(e.target.value);
+              }}
+              fullWidth
+            >
+              {GENDERS.map((value, index) => (
+                <MenuItem key={index} value={value}>
+                  {value}
+                </MenuItem>
+              ))}
+            </TextField>
+
+            <Button type="submit" variant="contained" color="primary">
+              Save
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                setPerson({
+                  id: "",
+                  Name: "",
+                  Partners: [],
+                  Children: [],
+                  Gender: "",
+                });
+                setEditId("");
+              }}
+            >
+              Cancel
+            </Button>
+          </React.Fragment>
         )}
-        value={defaultPartners}
-        onChange={(e: React.ChangeEvent, values: PersonModel[]) => {
-          setDefaultPartners(values);
-        }}
-        getOptionLabel={(option) => {
-          return option.Name;
-        }}
-        getOptionSelected={(option: PersonModel, value: PersonModel) => {
-          2;
-          if (!value) {
-            return false;
-          }
-
-          if (option.id == value.id) {
-            return true;
-          } else {
-            return false;
-          }
-        }}
-        ChipProps={{
-          color: "primary",
-          size: "small",
-          icon: <Avatar />,
-        }}
-        multiple
-        filterSelectedOptions
-        autoHighlight
-      />
-
-      <Autocomplete
-        ref={register}
-        options={people}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            label="Children"
-            name="Children"
-            inputRef={register}
-          />
-        )}
-        value={defaultChildren}
-        onChange={(e: React.ChangeEvent, values: PersonModel[]) => {
-          setDefaultChildren(values);
-        }}
-        getOptionLabel={(option) => {
-          return option.Name;
-        }}
-        getOptionSelected={(option: PersonModel, value: PersonModel) => {
-          if (!value) {
-            return false;
-          }
-
-          if (option.id == value.id) {
-            return true;
-          } else {
-            return false;
-          }
-        }}
-        ChipProps={{
-          color: "primary",
-          size: "small",
-          icon: <Avatar />,
-        }}
-        multiple
-        filterSelectedOptions
-        autoHighlight
-      />
-
-      <TextField
-        inputRef={register}
-        select
-        label="Gender"
-        name="Gender"
-        value={gender}
-        onChange={(e: any) => {
-          setGender(e.target.value);
-        }}
-        fullWidth
-      >
-        {GENDERS.map((value, index) => (
-          <MenuItem key={index} value={value}>
-            {value}
-          </MenuItem>
-        ))}
-      </TextField>
-
-      <Button type="submit" variant="contained" color="primary">
-        Submit
-      </Button>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => {
-          setPerson({
-            id: "",
-            Name: "",
-            Partners: [],
-            Children: [],
-            Gender: "",
-          });
-        }}
-      >
-        Clear
-      </Button>
-    </form>
+      </form>
+    </Container>
   );
 };
 
@@ -237,6 +246,7 @@ function mapStateToProps(state) {
   return {
     people: state.people,
     person: state.person,
+    editId: state.editId,
   };
 }
 
@@ -244,6 +254,7 @@ function mapDispatchToProps(dispatch) {
   return {
     setPeople: (people: PersonModel[]) => dispatch(setPeople(people)),
     setPerson: (person: PersonModel) => dispatch(setPerson(person)),
+    setEditId: (editId: string) => dispatch(setEditId(editId)),
   };
 }
 
