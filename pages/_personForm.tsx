@@ -13,7 +13,13 @@ import { Autocomplete } from "@material-ui/lab";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { PersonModel } from "../models/person";
-import { setEditId, setPeople, setPerson } from "../redux/actions/people";
+import {
+  setEditId,
+  setOpen,
+  setPeople,
+  setPerson,
+  setSearchName,
+} from "../redux/actions/people";
 import { db } from "../firebase";
 import { GENDERS } from "../redux/constants";
 import { fetchPeopleData } from "./index";
@@ -27,7 +33,8 @@ const PersonForm: React.FC<{
   setPerson: (person: PersonModel) => void;
   editId: string;
   setEditId: (editId: string) => void;
-}> = ({ people, person, setPerson, setPeople, editId, setEditId }) => {
+  setOpen: (open: boolean) => void;
+}> = ({ people, person, setPerson, setPeople, editId, setEditId, setOpen }) => {
   const classes = useStyles();
   const { register, handleSubmit } = useForm();
 
@@ -86,6 +93,7 @@ const PersonForm: React.FC<{
     });
 
     setEditId("");
+    setOpen(false);
   };
 
   const addEditPerson = async (person: PersonModel) => {
@@ -231,6 +239,7 @@ const PersonForm: React.FC<{
                   Gender: "",
                 });
                 setEditId("");
+                setOpen(false);
               }}
             >
               Cancel
@@ -247,6 +256,8 @@ function mapStateToProps(state) {
     people: state.people,
     person: state.person,
     editId: state.editId,
+    open: state.open,
+    searchName: state.searchName,
   };
 }
 
@@ -255,6 +266,8 @@ function mapDispatchToProps(dispatch) {
     setPeople: (people: PersonModel[]) => dispatch(setPeople(people)),
     setPerson: (person: PersonModel) => dispatch(setPerson(person)),
     setEditId: (editId: string) => dispatch(setEditId(editId)),
+    setOpen: (open: boolean) => dispatch(setOpen(open)),
+    setSearchName: (name: string) => dispatch(setSearchName(name)),
   };
 }
 

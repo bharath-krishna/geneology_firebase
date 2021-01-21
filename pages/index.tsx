@@ -24,6 +24,7 @@ import {
 import { db } from "../firebase";
 import { PersonModel } from "../models/person";
 import PersonForm from "./_personForm";
+import AddPersonDialog from "./_addPersonDialog";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -54,7 +55,7 @@ export const fetchPeopleData = async (setter) => {
 const Index: React.FC<{
   person: PersonModel;
   people: PersonModel[];
-  setPerson: () => void;
+  setPerson: (person: PersonModel) => void;
   setPeople: ({}) => void;
   editId: string;
   setEditId: (editId: string) => void;
@@ -97,7 +98,15 @@ const Index: React.FC<{
   }, [searchName, person, editId]);
 
   const handleAddPerson = () => {
-    console.log("dfsdfsd");
+    setEditId("");
+    setPerson({
+      id: "",
+      Name: "",
+      Partners: [],
+      Children: [],
+      Gender: "",
+    });
+    setOpen(true);
   };
 
   return (
@@ -106,6 +115,7 @@ const Index: React.FC<{
         <Grid item sm={12} md={6}>
           <Typography variant="h5">Search People</Typography>
           <TextField
+            size="small"
             variant="outlined"
             label="Enter Name"
             value={searchName}
@@ -113,6 +123,17 @@ const Index: React.FC<{
               setSearchName(e.target.value);
             }}
           />
+          <Button
+            onClick={() => setSearchName("")}
+            variant="contained"
+            color="primary"
+          >
+            Clear
+          </Button>
+          <Button onClick={handleAddPerson} variant="contained" color="primary">
+            Add person
+          </Button>
+          <AddPersonDialog />
           <List>
             {filteredPeople.length > 0 ? (
               filteredPeople.map((elem, index) => {
@@ -132,9 +153,6 @@ const Index: React.FC<{
               <div>No matches</div>
             )}
           </List>
-        </Grid>
-        <Grid item sm={12} md={6} className={classes.formGrid}>
-          <PersonForm />
         </Grid>
       </Grid>
     </Container>
