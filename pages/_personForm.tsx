@@ -5,25 +5,26 @@ import {
   makeStyles,
   MenuItem,
   TextField,
+  Typography,
 } from "@material-ui/core";
 import { Autocomplete } from "@material-ui/lab";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { PersonModel } from "../models/person";
 import { setPeople, setPerson } from "../redux/actions/people";
 import { db } from "../firebase";
 import { GENDERS } from "../redux/constants";
 import { Container } from "next/app";
+import { fetchPeopleData } from "./index";
 
 const useStyles = makeStyles((theme) => ({}));
 
 const PersonForm: React.FC<{
   people: PersonModel[];
   person: PersonModel;
-  fetchPeopleData: (setter) => void;
   setPeople: (people: PersonModel[]) => void;
   setPerson: (person: PersonModel) => void;
-}> = ({ people, person, setPerson, fetchPeopleData, setPeople }) => {
+}> = ({ people, person, setPerson, setPeople }) => {
   const classes = useStyles();
   const { register, handleSubmit } = useForm();
 
@@ -34,6 +35,11 @@ const PersonForm: React.FC<{
   const [defaultPartners, setDefaultPartners] = useState<PersonModel[]>([]);
   const [defaultChildren, setDefaultChildren] = useState<PersonModel[]>([]);
   const [gender, setGender] = useState<string>(person.Gender);
+
+  const [nameEdit, nameEditToggler] = useState<boolean>(false);
+  const [partnerEdit, partnerEditToggler] = useState<boolean>(false);
+  const [childrenEdit, childrenEditToggler] = useState<boolean>(false);
+  const [genderEdit, genderEditToggler] = useState<boolean>(false);
 
   const getById = async (id) => {
     const data = await db.collection("people").doc(id).get();
@@ -72,7 +78,6 @@ const PersonForm: React.FC<{
     data.Children = defaultChildren.map((person) => person.id);
     data.Gender = gender;
     data.id = id;
-    console.log("OnSubit", data);
     addEditPerson(data);
   };
 
@@ -102,6 +107,11 @@ const PersonForm: React.FC<{
         value={name}
         onChange={(e: any) => setName(e.target.value)}
         fullWidth
+        onKeyPress={(e) => {
+          if (e.key === "Enter") {
+            nameEditToggler(!nameEdit);
+          }
+        }}
       />
 
       <Autocomplete
@@ -123,6 +133,7 @@ const PersonForm: React.FC<{
           return option.Name;
         }}
         getOptionSelected={(option: PersonModel, value: PersonModel) => {
+          2;
           if (!value) {
             return false;
           }

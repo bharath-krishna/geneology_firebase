@@ -1,4 +1,5 @@
-import { SET_PEOPLE, SET_PERSON } from "../constants";
+import { PersonModel } from "../../models/person";
+import { RELOAD_PEOPLE, SET_PEOPLE, SET_PERSON } from "../constants";
 
 export const setPeople = (personObject) => {
   return {

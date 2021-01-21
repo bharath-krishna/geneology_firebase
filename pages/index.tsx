@@ -1,26 +1,20 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
-import { AuthContext } from "./Auth";
 import {
-  Avatar,
-  Button,
+  Card,
+  CardContent,
+  CardMedia,
+  Chip,
   Grid,
   List,
   ListItem,
-  ListItemAvatar,
-  ListItemSecondaryAction,
-  ListItemText,
   makeStyles,
-  TextField,
 } from "@material-ui/core";
 import { connect } from "react-redux";
 import { setPeople, setPerson } from "../redux/actions/people";
 import { db } from "../firebase";
 import { PersonModel } from "../models/person";
-import PersonModal from "./_personModal";
-import { useForm } from "react-hook-form";
-import { Autocomplete } from "@material-ui/lab";
 import PersonForm from "./_personForm";
 
 const useStyles = makeStyles((theme) => ({
@@ -30,7 +24,24 @@ const useStyles = makeStyles((theme) => ({
   formGrid: {
     minWidth: 350,
   },
+  card: {
+    minWidth: 550,
+    minHeight: 150,
+    display: "flex",
+  },
+  media: {
+    height: 150,
+    width: 100,
+  },
+  content: {
+    flex: "1 0 auto",
+  },
 }));
+
+export const fetchPeopleData = async (setter) => {
+  const data = await db.collection("people").get();
+  setter(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+};
 
 const Index: React.FC<{
   person: PersonModel;
@@ -41,11 +52,6 @@ const Index: React.FC<{
   const classes = useStyles();
   // const { user } = useContext(AuthContext);
   const [open, setOpen] = useState(false);
-
-  const fetchPeopleData = async (setter) => {
-    const data = await db.collection("people").get();
-    setter(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-  };
 
   useEffect(() => {
     fetchPeopleData(setPeople);
@@ -62,13 +68,18 @@ const Index: React.FC<{
           <List>
             {people.map((elem, index) => {
               return (
-                <PersonItem item={elem} key={index} setPerson={setPerson} />
+                <PersonItem
+                  item={elem}
+                  key={index}
+                  setPerson={setPerson}
+                  people={people}
+                />
               );
             })}
           </List>
         </Grid>
         <Grid item sm={12} md={6} className={classes.formGrid}>
-          <PersonForm fetchPeopleData={fetchPeopleData} />
+          <PersonForm />
         </Grid>
       </Grid>
     </Container>
@@ -94,7 +105,19 @@ export default connect(mapStateToProps, mapDispatchToProps)(Index);
 const PersonItem: React.FC<{
   item: PersonModel;
   setPerson: (item) => void;
-}> = ({ item, setPerson }) => {
+  people: PersonModel[];
+}> = ({ item, setPerson, people }) => {
+  const classes = useStyles();
+
+  const getPersonById = (id) => {
+    const idPerson = people.filter((person: PersonModel) => {
+      if (person.id === id) {
+        return person;
+      }
+    });
+    return idPerson;
+  };
+
   const handleEdit = () => {
     setPerson(item);
   };
@@ -105,25 +128,51 @@ const PersonItem: React.FC<{
 
   return (
     <ListItem button onClick={handleEdit}>
-      <ListItemAvatar>
-        <Avatar />
-      </ListItemAvatar>
-      <ListItemText
-        primary={item.Name}
-        secondary={
-          <React.Fragment>
-            <Typography variant="body2" component="span">
-              {item.Gender}, has children{" "}
-              {item.Children.map((id) => {
-                return id;
-              })}
+      <Card className={classes.card}>
+        <CardMedia image="./purple_landscape.jpeg" className={classes.media} />
+        <CardContent className={classes.content}>
+          <Typography variant="h6">{item.Name}</Typography>
+          <Typography>Partners</Typography>
+          {item.Partners.length > 0 ? (
+            item.Partners.map((id) => {
+              if (getPersonById(id)) {
+                return (
+                  <Chip
+                    label={getPersonById(id)[0].Name}
+                    size="small"
+                    color="primary"
+                  />
+                );
+              }
+            })
+          ) : (
+            <Typography variant="body2" color="secondary">
+              Unknown
             </Typography>
-          </React.Fragment>
-        }
-      />
-      <ListItemSecondaryAction>
-        {/* <Button onClick={handleEdit}>Edit</Button> */}
-      </ListItemSecondaryAction>
+          )}
+          <Typography>Children</Typography>
+          {item.Children.length > 0 ? (
+            item.Children.map((id) => {
+              if (getPersonById(id)) {
+                return (
+                  <Chip
+                    label={getPersonById(id)[0].Name}
+                    size="small"
+                    color="primary"
+                  />
+                );
+              }
+            })
+          ) : (
+            <Typography variant="body2" color="secondary">
+              None
+            </Typography>
+          )}
+        </CardContent>
+        {/* <CardContent>
+          <PersonForm />
+        </CardContent> */}
+      </Card>
     </ListItem>
   );
 };

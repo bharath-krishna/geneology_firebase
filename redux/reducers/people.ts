@@ -1,5 +1,6 @@
+import { db } from "../../firebase";
 import { PersonModel } from "../../models/person";
-import { SET_PEOPLE, SET_PERSON } from "../constants";
+import { RELOAD_PEOPLE, SET_PEOPLE, SET_PERSON } from "../constants";
 
 let initialPeopleState = [];
 
