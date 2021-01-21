@@ -2,12 +2,10 @@ import { connect } from "react-redux";
 import {
   Avatar,
   Button,
-  Chip,
   Container,
   makeStyles,
   MenuItem,
   TextField,
-  Typography,
 } from "@material-ui/core";
 import { Autocomplete } from "@material-ui/lab";
 import React, { useEffect, useState } from "react";
@@ -40,10 +38,8 @@ const PersonForm: React.FC<{
 
   const [id, setId] = useState<string>(person.id);
   const [name, setName] = useState<string>(person.Name);
-  const [partners, setPartners] = useState<string[]>([]);
-  const [children, setChildren] = useState<string[]>([]);
-  const [defaultPartners, setDefaultPartners] = useState<PersonModel[]>([]);
-  const [defaultChildren, setDefaultChildren] = useState<PersonModel[]>([]);
+  const [partners, setPartners] = useState<PersonModel[]>([]);
+  const [children, setChildren] = useState<PersonModel[]>([]);
   const [gender, setGender] = useState<string>(person.Gender);
 
   const getById = async (id) => {
@@ -54,21 +50,21 @@ const PersonForm: React.FC<{
   useEffect(() => {
     setName(person.Name);
 
-    setDefaultPartners([]);
+    setPartners([]);
     person.Partners.map((id) => {
       const data = getById(id).then((result: PersonModel) => {
         result.id = id;
-        setDefaultPartners((prevState: PersonModel[]) => {
+        setPartners((prevState: PersonModel[]) => {
           return [...prevState, result];
         });
       });
     });
 
-    setDefaultChildren([]);
+    setChildren([]);
     person.Children.map((id) => {
       const data = getById(id).then((result: PersonModel) => {
         result.id = id;
-        setDefaultChildren((prevState: PersonModel[]) => {
+        setChildren((prevState: PersonModel[]) => {
           return [...prevState, result];
         });
       });
@@ -79,8 +75,8 @@ const PersonForm: React.FC<{
   }, [person]);
 
   const handleOnSubmit = (data) => {
-    data.Partners = defaultPartners.map((person) => person.id);
-    data.Children = defaultChildren.map((person) => person.id);
+    data.Partners = partners.map((person) => person.id);
+    data.Children = children.map((person) => person.id);
     data.Gender = gender;
     data.id = id;
     addEditPerson(data);
@@ -138,9 +134,9 @@ const PersonForm: React.FC<{
                   inputRef={register}
                 />
               )}
-              value={defaultPartners}
+              value={partners}
               onChange={(e: React.ChangeEvent, values: PersonModel[]) => {
-                setDefaultPartners(values);
+                setPartners(values);
               }}
               getOptionLabel={(option) => {
                 return option.Name;
@@ -178,9 +174,9 @@ const PersonForm: React.FC<{
                   inputRef={register}
                 />
               )}
-              value={defaultChildren}
+              value={children}
               onChange={(e: React.ChangeEvent, values: PersonModel[]) => {
-                setDefaultChildren(values);
+                setChildren(values);
               }}
               getOptionLabel={(option) => {
                 return option.Name;
