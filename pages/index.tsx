@@ -120,6 +120,14 @@ const Index: React.FC<{
             label="Enter Name"
             value={searchName}
             onChange={(e) => {
+              setEditId("");
+              setPerson({
+                id: "",
+                Name: "",
+                Partners: [],
+                Children: [],
+                Gender: "",
+              });
               setSearchName(e.target.value);
             }}
           />

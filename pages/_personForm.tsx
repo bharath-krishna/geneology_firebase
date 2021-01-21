@@ -160,7 +160,7 @@ const PersonForm: React.FC<{
               ChipProps={{
                 color: "primary",
                 size: "small",
-                icon: <Avatar />,
+                icon: <Avatar sizes="small" />,
               }}
               multiple
               filterSelectedOptions
