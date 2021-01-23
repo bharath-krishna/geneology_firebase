@@ -101,8 +101,16 @@ function CustomAppBar({ user }) {
         open={isMenuOpen}
         onClose={handleMenuClose}
       >
-        <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-        <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+        <MenuItem onClick={handleMenuClose}>
+          <Button color="inherit" component={Link} href="/profile">
+            Profile
+          </Button>
+        </MenuItem>
+        <MenuItem onClick={handleMenuClose}>
+          <Button color="inherit" component={Link} href="/account">
+            My account
+          </Button>
+        </MenuItem>
       </Menu>
     </div>
   );
