@@ -1,4 +1,4 @@
-import { Breadcrumbs, Container, List } from "@material-ui/core";
+import { Breadcrumbs, Button, Container, List } from "@material-ui/core";
 import React, { useEffect } from "react";
 import { fetchCollection } from "../../utils/temple";
 import { connect } from "react-redux";
@@ -19,8 +19,12 @@ function Temples({ setTemples, temples }) {
       <CustomAppBar />
       <Container>
         <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-          <Link href="/">Home</Link>
-          <Link href="/temples">Temples</Link>
+          <Button color="inherit" component={Link} href="/">
+            Home
+          </Button>
+          <Button color="inherit" component={Link} href="/temples">
+            Temples
+          </Button>
         </Breadcrumbs>
         <List>
           {temples.length > 0 ? (

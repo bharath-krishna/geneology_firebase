@@ -114,7 +114,9 @@ const Index: React.FC<{
       <CustomAppBar />
       <Container>
         <Breadcrumbs>
-          <Link href="/">Home</Link>
+          <Button color="inherit" component={Link} href="/">
+            Home
+          </Button>
         </Breadcrumbs>
         <Grid container alignContent="center">
           <Grid item sm={12} md={6}>
