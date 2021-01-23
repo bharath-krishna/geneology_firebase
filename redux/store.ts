@@ -14,6 +14,7 @@ import {
   personReducer,
   searchNameReducer,
 } from "./reducers/people";
+import { templeReducer } from "./reducers/temple";
 
 const bindMiddleware = (middleware) => {
   if (process.env.NODE_ENV !== "production") {
@@ -30,6 +31,7 @@ const allReducers = combineReducers({
   editId: editIdReducer,
   open: openReducer,
   searchName: searchNameReducer,
+  temples: templeReducer,
 });
 
 const reducer = (state, action) => {

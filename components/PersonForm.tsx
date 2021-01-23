@@ -20,7 +20,7 @@ import {
 } from "../redux/actions/people";
 import firebase from "../firebase";
 import { GENDERS } from "../redux/constants";
-import { fetchPeopleData } from "./index";
+import { fetchCollection } from "../utils/temple";
 
 const useStyles = makeStyles((theme) => ({}));
 
@@ -110,7 +110,7 @@ const PersonForm: React.FC<{
       Gender: "",
     });
 
-    fetchPeopleData(setPeople);
+    fetchCollection("people", setPeople);
   };
 
   return (

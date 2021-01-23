@@ -4,7 +4,6 @@ import {
   DialogContent,
   DialogTitle,
   makeStyles,
-  TextField,
 } from "@material-ui/core";
 import { connect } from "react-redux";
 import {
@@ -15,7 +14,7 @@ import {
   setSearchName,
 } from "../redux/actions/people";
 import { PersonModel } from "../models/person";
-import PersonForm from "./_personForm";
+import PersonForm from "./PersonForm";
 
 const useStyles = makeStyles((theme) => ({
   modal: {

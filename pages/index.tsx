@@ -1,20 +1,13 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
 import {
-  AppBar,
+  Breadcrumbs,
   Button,
-  Card,
-  CardContent,
-  CardMedia,
-  Chip,
   Grid,
-  IconButton,
   List,
-  ListItem,
   makeStyles,
   TextField,
-  Toolbar,
 } from "@material-ui/core";
 import { connect } from "react-redux";
 import {
@@ -26,14 +19,13 @@ import {
 } from "../redux/actions/people";
 import firebase from "../firebase";
 import { PersonModel } from "../models/person";
-import PersonForm from "./_personForm";
-import AddPersonDialog from "./_addPersonDialog";
-import { AuthContext } from "./_Auth";
-import MenuIcon from "@material-ui/icons/Menu";
+import AddPersonDialog from "../components/AddPersonDialog";
+import CustomAppBar from "../components/CustomAppBar";
+import PersonItem from "../components/PersonItem";
+import Link from "../src/Link";
+import { fetchCollection } from "../utils/temple";
+
 const useStyles = makeStyles((theme) => ({
-  container: {
-    padding: "40px",
-  },
   formGrid: {
     minWidth: 350,
   },
@@ -59,11 +51,6 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
 }));
-
-export const fetchPeopleData = async (setter) => {
-  const data = await firebase.firestore().collection("people").get();
-  setter(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-};
 
 const Index: React.FC<{
   person: PersonModel;
@@ -94,8 +81,8 @@ const Index: React.FC<{
   const [filteredPeople, setFilteredPeople] = useState<PersonModel[]>([]);
 
   useEffect(() => {
-    fetchPeopleData(setPeople);
-    fetchPeopleData(setFilteredPeople);
+    fetchCollection("people", setPeople);
+    fetchCollection("people", setFilteredPeople);
   }, []);
 
   useEffect(() => {
@@ -122,40 +109,13 @@ const Index: React.FC<{
     setOpen(true);
   };
 
-  const logout = () => {
-    firebase
-      .auth()
-      .signOut()
-      .then(() => {
-        // Sign-out successful.
-      })
-      .catch((error) => {
-        // An error happened.
-      });
-  };
   return (
     <React.Fragment>
-      <div className={classes.appbar}>
-        <AppBar position="static">
-          <Toolbar>
-            <IconButton
-              edge="start"
-              className={classes.menuButton}
-              color="inherit"
-              aria-label="menu"
-            >
-              <MenuIcon />
-            </IconButton>
-            <Typography variant="h6" className={classes.title}>
-              {user.displayName}
-            </Typography>
-            <Button color="inherit" onClick={logout}>
-              Logout
-            </Button>
-          </Toolbar>
-        </AppBar>
-      </div>
-      <Container className={classes.container}>
+      <CustomAppBar />
+      <Container>
+        <Breadcrumbs>
+          <Link href="/">Home</Link>
+        </Breadcrumbs>
         <Grid container alignContent="center">
           <Grid item sm={12} md={6}>
             <Typography variant="h5">Search People</Typography>
@@ -239,96 +199,3 @@ function mapDispatchToProps(dispatch) {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Index);
-
-const PersonItem: React.FC<{
-  item: PersonModel;
-  setPerson: (item) => void;
-  people: PersonModel[];
-  setEditId: (editId: string) => void;
-  editId: string;
-  setSearchName;
-}> = ({ item, setPerson, people, setEditId, editId, setSearchName }) => {
-  const classes = useStyles();
-
-  const getPersonById = (id) => {
-    const idPerson = people.filter((person: PersonModel) => {
-      if (person.id === id) {
-        return person;
-      }
-    });
-    return idPerson;
-  };
-
-  const handleEdit = () => {
-    setPerson(item);
-    setEditId(item.id);
-  };
-
-  return (
-    <ListItem>
-      <Card className={classes.card}>
-        <CardMedia image="./purple_landscape.jpeg" className={classes.media} />
-        {editId === item.id ? (
-          <PersonForm />
-        ) : (
-          <CardContent className={classes.content}>
-            <Grid container>
-              <Grid>
-                <Typography variant="h6">{item.Name}</Typography>
-              </Grid>
-              <Grid>
-                <Button onClick={handleEdit}>Edit</Button>
-              </Grid>
-            </Grid>
-            <Typography>Partners</Typography>
-            {item.Partners.length > 0 ? (
-              item.Partners.map((id) => {
-                if (getPersonById(id)) {
-                  const idPerson = getPersonById(id)[0];
-                  return (
-                    <Chip
-                      key={id}
-                      label={idPerson.Name}
-                      size="small"
-                      color="primary"
-                      onClick={() => {
-                        setSearchName(idPerson.Name);
-                      }}
-                    />
-                  );
-                }
-              })
-            ) : (
-              <Typography variant="body2" color="secondary">
-                Unknown
-              </Typography>
-            )}
-            <Typography>Children</Typography>
-            {item.Children.length > 0 ? (
-              item.Children.map((id) => {
-                if (getPersonById(id)) {
-                  const idPerson = getPersonById(id)[0];
-                  return (
-                    <Chip
-                      key={id}
-                      label={idPerson.Name}
-                      size="small"
-                      color="primary"
-                      onClick={() => {
-                        setSearchName(idPerson.Name);
-                      }}
-                    />
-                  );
-                }
-              })
-            ) : (
-              <Typography variant="body2" color="secondary">
-                None
-              </Typography>
-            )}
-          </CardContent>
-        )}
-      </Card>
-    </ListItem>
-  );
-};
