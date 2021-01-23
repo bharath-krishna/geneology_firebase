@@ -4,4 +4,5 @@ export type PersonModel = {
   Partners: string[];
   Children: string[];
   Gender: string;
+  createdBy?: string;
 };

@@ -18,7 +18,7 @@ import {
   setPerson,
   setSearchName,
 } from "../redux/actions/people";
-import { db } from "../firebase";
+import firebase from "../firebase";
 import { GENDERS } from "../redux/constants";
 import { fetchPeopleData } from "./index";
 
@@ -43,7 +43,7 @@ const PersonForm: React.FC<{
   const [gender, setGender] = useState<string>(person.Gender);
 
   const getById = async (id) => {
-    const data = await db.collection("people").doc(id).get();
+    const data = await firebase.firestore().collection("people").doc(id).get();
     return data.data();
   };
 
@@ -94,9 +94,13 @@ const PersonForm: React.FC<{
 
   const addEditPerson = async (person: PersonModel) => {
     if (person.id !== "") {
-      const doc = await db.collection("people").doc(person.id).set(person);
+      const doc = await firebase
+        .firestore()
+        .collection("people")
+        .doc(person.id)
+        .set(person);
     } else {
-      const doc = await db.collection("people").add(person);
+      const doc = await firebase.firestore().collection("people").add(person);
     }
     setPerson({
       id: "",

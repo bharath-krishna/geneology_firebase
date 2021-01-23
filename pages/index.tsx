@@ -1,17 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
 import {
+  AppBar,
   Button,
   Card,
   CardContent,
   CardMedia,
   Chip,
   Grid,
+  IconButton,
   List,
   ListItem,
   makeStyles,
   TextField,
+  Toolbar,
 } from "@material-ui/core";
 import { connect } from "react-redux";
 import {
@@ -21,11 +24,12 @@ import {
   setPerson,
   setSearchName,
 } from "../redux/actions/people";
-import { db } from "../firebase";
+import firebase from "../firebase";
 import { PersonModel } from "../models/person";
 import PersonForm from "./_personForm";
 import AddPersonDialog from "./_addPersonDialog";
-
+import { AuthContext } from "./_Auth";
+import MenuIcon from "@material-ui/icons/Menu";
 const useStyles = makeStyles((theme) => ({
   container: {
     padding: "40px",
@@ -45,10 +49,19 @@ const useStyles = makeStyles((theme) => ({
   content: {
     flex: "1 0 auto",
   },
+  appbar: {
+    flexGrow: 1,
+  },
+  menuButton: {
+    marginRight: theme.spacing(2),
+  },
+  title: {
+    flexGrow: 1,
+  },
 }));
 
 export const fetchPeopleData = async (setter) => {
-  const data = await db.collection("people").get();
+  const data = await firebase.firestore().collection("people").get();
   setter(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
 };
 
@@ -63,6 +76,7 @@ const Index: React.FC<{
   setOpen: (open: boolean) => void;
   searchName: string;
   setSearchName: (name: string) => void;
+  user;
 }> = ({
   person,
   setPerson,
@@ -74,10 +88,9 @@ const Index: React.FC<{
   setOpen,
   searchName,
   setSearchName,
+  user,
 }) => {
   const classes = useStyles();
-  // const { user } = useContext(AuthContext);
-  // const [searchName, setSearchName] = useState("");
   const [filteredPeople, setFilteredPeople] = useState<PersonModel[]>([]);
 
   useEffect(() => {
@@ -109,61 +122,98 @@ const Index: React.FC<{
     setOpen(true);
   };
 
+  const logout = () => {
+    firebase
+      .auth()
+      .signOut()
+      .then(() => {
+        // Sign-out successful.
+      })
+      .catch((error) => {
+        // An error happened.
+      });
+  };
   return (
-    <Container className={classes.container}>
-      <Grid container alignContent="center">
-        <Grid item sm={12} md={6}>
-          <Typography variant="h5">Search People</Typography>
-          <TextField
-            size="small"
-            variant="outlined"
-            label="Enter Name"
-            value={searchName}
-            onChange={(e) => {
-              setEditId("");
-              setPerson({
-                id: "",
-                Name: "",
-                Partners: [],
-                Children: [],
-                Gender: "",
-              });
-              setSearchName(e.target.value);
-            }}
-          />
-          <Button
-            onClick={() => setSearchName("")}
-            variant="contained"
-            color="primary"
-          >
-            Clear
-          </Button>
-          <Button onClick={handleAddPerson} variant="contained" color="primary">
-            Add person
-          </Button>
-          <AddPersonDialog />
-          <List>
-            {filteredPeople.length > 0 ? (
-              filteredPeople.map((elem, index) => {
-                return (
-                  <PersonItem
-                    item={elem}
-                    key={index}
-                    setPerson={setPerson}
-                    people={people}
-                    setEditId={setEditId}
-                    editId={editId}
-                    setSearchName={setSearchName}
-                  />
-                );
-              })
-            ) : (
-              <div>No matches</div>
-            )}
-          </List>
+    <React.Fragment>
+      <div className={classes.appbar}>
+        <AppBar position="static">
+          <Toolbar>
+            <IconButton
+              edge="start"
+              className={classes.menuButton}
+              color="inherit"
+              aria-label="menu"
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography variant="h6" className={classes.title}>
+              {user.displayName}
+            </Typography>
+            <Button color="inherit" onClick={logout}>
+              Logout
+            </Button>
+          </Toolbar>
+        </AppBar>
+      </div>
+      <Container className={classes.container}>
+        <Grid container alignContent="center">
+          <Grid item sm={12} md={6}>
+            <Typography variant="h5">Search People</Typography>
+            <TextField
+              size="small"
+              variant="outlined"
+              label="Enter Name"
+              value={searchName}
+              onChange={(e) => {
+                setEditId("");
+                setPerson({
+                  id: "",
+                  Name: "",
+                  Partners: [],
+                  Children: [],
+                  Gender: "",
+                });
+                setSearchName(e.target.value);
+              }}
+            />
+            <Button
+              onClick={() => setSearchName("")}
+              variant="contained"
+              color="primary"
+            >
+              Clear
+            </Button>
+            <Button
+              onClick={handleAddPerson}
+              variant="contained"
+              color="primary"
+            >
+              Add person
+            </Button>
+            <AddPersonDialog />
+            <List>
+              {filteredPeople.length > 0 ? (
+                filteredPeople.map((elem, index) => {
+                  return (
+                    <PersonItem
+                      item={elem}
+                      key={index}
+                      setPerson={setPerson}
+                      people={people}
+                      setEditId={setEditId}
+                      editId={editId}
+                      setSearchName={setSearchName}
+                    />
+                  );
+                })
+              ) : (
+                <div>No matches</div>
+              )}
+            </List>
+          </Grid>
         </Grid>
-      </Grid>
-    </Container>
+      </Container>
+    </React.Fragment>
   );
 };
 
@@ -174,6 +224,7 @@ function mapStateToProps(state) {
     editId: state.editId,
     open: state.open,
     searchName: state.searchName,
+    user: state.user,
   };
 }
 
