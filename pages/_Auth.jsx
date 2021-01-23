@@ -55,7 +55,11 @@ function AuthProvider({ children, user, setUser }) {
           {/* <CircularProgress /> */}
           <Container>
             <Button onClick={login}>Login</Button>
-            {error && <Alert severity="danger">{error}</Alert>}
+            {error && (
+              <Alert severity="error" variant="filled">
+                {error}
+              </Alert>
+            )}
           </Container>
         </Container>
       )}
