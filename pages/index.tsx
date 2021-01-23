@@ -76,6 +76,7 @@ const Index: React.FC<{
   setOpen: (open: boolean) => void;
   searchName: string;
   setSearchName: (name: string) => void;
+  user;
 }> = ({
   person,
   setPerson,
@@ -87,10 +88,9 @@ const Index: React.FC<{
   setOpen,
   searchName,
   setSearchName,
+  user,
 }) => {
   const classes = useStyles();
-  const { user } = useContext(AuthContext);
-  // const [searchName, setSearchName] = useState("");
   const [filteredPeople, setFilteredPeople] = useState<PersonModel[]>([]);
 
   useEffect(() => {
@@ -147,7 +147,7 @@ const Index: React.FC<{
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" className={classes.title}>
-              News
+              {user.displayName}
             </Typography>
             <Button color="inherit" onClick={logout}>
               Logout
@@ -224,6 +224,7 @@ function mapStateToProps(state) {
     editId: state.editId,
     open: state.open,
     searchName: state.searchName,
+    user: state.user,
   };
 }
 
