@@ -4,7 +4,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 Befire running dev server install required packages as below
 ```
-yarn add @material-ui/core @material-ui/lab @material-ui/icons redux react-redux typescript firebase next-redux-wrapper redux-devtools-extension redux-thunk
+yarn add @material-ui/core @material-ui/lab @material-ui/icons redux react-redux typescript firebase next-redux-wrapper redux-devtools-extension redux-thunk prop-types react-hook-form firebase-admin react-force-graph-2d
 ```
 
 First, run the development server:

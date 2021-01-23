@@ -2,10 +2,8 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firebase-firestore";
 
-let app: firebase.app.App;
-
 if (!firebase.apps.length) {
-  app = firebase.initializeApp({
+  firebase.initializeApp({
     apiKey: process.env.NEXT_PUBLIC_API_KEY,
     authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
     databaseURL: process.env.NEXT_PUBLIC_DATA_BASEURL,
@@ -16,8 +14,7 @@ if (!firebase.apps.length) {
     measurementId: process.env.NEXT_PUBLIC_MEASUREMENT_ID,
   });
 } else {
-  app = firebase.app();
+  firebase.app();
 }
 
-export const db: firebase.firestore.Firestore = firebase.firestore();
-export default app;
+export default firebase;
