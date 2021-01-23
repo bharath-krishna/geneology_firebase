@@ -1,14 +1,16 @@
 import { Button, CircularProgress, Container } from "@material-ui/core";
-import React, { createContext, useEffect } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { setUser } from "../redux/actions/user";
 import firebase from "../firebase";
 import { useRouter } from "next/router";
+import { Alert } from "@material-ui/lab";
 
 export const AuthContext = createContext();
 
 function AuthProvider({ children, user, setUser }) {
   const router = useRouter();
+  const [error, setError] = useState("");
 
   useEffect(() => {
     firebase.auth().onAuthStateChanged((user) => {
@@ -33,7 +35,7 @@ function AuthProvider({ children, user, setUser }) {
         })
         .catch((error) => {
           var errorCode = error.code;
-          var errorMessage = error.message;
+          setError(error.message);
           var email = error.email;
           var credential = error.credential;
         });
@@ -53,6 +55,7 @@ function AuthProvider({ children, user, setUser }) {
           {/* <CircularProgress /> */}
           <Container>
             <Button onClick={login}>Login</Button>
+            {error && <Alert severity="danger">{error}</Alert>}
           </Container>
         </Container>
       )}
